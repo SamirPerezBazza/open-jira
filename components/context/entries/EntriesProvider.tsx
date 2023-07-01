@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EntriesContext, entriesReducer } from './';
 import { Entry } from '@/interfaces';
 import { entriesApi } from '@/api';
+import { useSnackbar } from 'notistack';
 
 export interface EntriesState {
 	entries: Entry[];
@@ -18,6 +19,8 @@ export const EntriesProvider: FC<PropsWithChildren> = ({ children }) => {
 		ENTRIES_INITIAL_STATE
 	);
 
+	const { enqueueSnackbar } = useSnackbar();
+
 	const addNewEntry = async (description: string) => {
 		const { data } = await entriesApi.post<Entry>('/entries', {
 			description,
@@ -26,7 +29,7 @@ export const EntriesProvider: FC<PropsWithChildren> = ({ children }) => {
 		entriesDispatch({ type: '[Entry] Add Entry', payload: data });
 	};
 
-	const updateEntry = async (entry: Entry) => {
+	const updateEntry = async (entry: Entry, showSnackbar = false) => {
 		try {
 			const { _id, description, status } = entry;
 
@@ -36,6 +39,17 @@ export const EntriesProvider: FC<PropsWithChildren> = ({ children }) => {
 			});
 
 			entriesDispatch({ type: '[Entry] Update Entry', payload: data });
+
+			if (showSnackbar) {
+				enqueueSnackbar('Entrada actualizada', {
+					variant: 'success',
+					autoHideDuration: 1500,
+					anchorOrigin: {
+						vertical: 'top',
+						horizontal: 'right',
+					},
+				});
+			}
 		} catch (error) {}
 	};
 
