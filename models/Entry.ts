@@ -14,6 +14,7 @@ const entrySchema = new Schema({
       values: ['pending', 'in-Progress', 'finished'],
       message: '{VALUE} is not supported',
     },
+    default: 'pending'
   },
 });
 
